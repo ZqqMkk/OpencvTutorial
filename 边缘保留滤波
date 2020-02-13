@@ -1,0 +1,37 @@
+1.知识点简述：
+（1）对比高斯模糊
+    高斯模糊是考虑图像空间位置对权重的影响，但是它没有考虑图像像素分布对图像卷积输出的影响，双边模糊考虑了像素值分布的影响，
+对像素值空间分布差异较大的进行保留从而完整的保留了图像的边缘信息。
+（2）特点
+    边缘保留滤波算法（EPF）有能力通过卷积处理实现图像模糊的同时对图像边缘不会造成破坏，滤波之后的输出完整的保存了图像整体边缘（轮廓）信息。
+双边模糊可以去除无关噪声，同时保持较好的边缘信息。 但是，其速度比绝大多数滤波器都慢。 
+    最常见的边缘保留滤波算法有以下几种：
+    高斯双边模糊
+	  Meanshift均值迁移模糊
+	  局部均方差模糊
+    
+    
+2.代码：
+#边缘保留滤波EPF
+import cv2 as cv
+import numpy as np
+
+def bi_demo(image):
+    dst=cv.bilateralFilter(image,0,100,15)
+    cv.imshow("bi_demo",dst)
+
+#均值迁移方法
+def shift_demo(image):
+    dst=cv.pyrMeanShiftFiltering(image,10,50)
+    cv.imshow("shift_demo",dst)
+
+print("--------helloword--------")
+src = cv.imread("E:/ZqqWinterHoliday/CARD/Lisa1.jpg")
+cv.namedWindow("input image",cv.WINDOW_AUTOSIZE)  #提供一个窗口显示图像
+cv.imshow("input image",src)
+bi_demo(src)
+shift_demo(src)
+cv.waitKey(0)
+
+cv.destroyAllWindows()
+
