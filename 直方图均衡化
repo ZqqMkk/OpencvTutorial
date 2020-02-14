@@ -1,0 +1,63 @@
+课堂说：1.opencv中直方图均衡化都是针对灰度图像。
+       2.直方图均衡化为图像增强的一个手段。
+       3.createCLAHE方法中clipLimit参数的意义？？？
+
+
+源码：
+import cv2 as cv
+import numpy as np
+
+#全局直方图均衡化
+def equalHist_demo(image):
+    gray=cv.cvtColor(image,cv.COLOR_RGB2GRAY) #将图片转换为灰度图像
+    #cv.imshow("COLOR_RGB2GRAY",gray)
+    dst=cv.equalizeHist(gray)#直方图均衡化
+    cv.imshow("equalHist_demo",dst)
+
+#局部直方图均衡化
+def clahe_demo(image):
+    gray = cv.cvtColor(image, cv.COLOR_RGB2GRAY)  # 将图片转换为灰度图像
+    clahe = cv.createCLAHE(clipLimit=2,tileGridSize=(8,8))  # 局部直方图均衡化
+    dst=clahe.apply(gray)
+    cv.imshow("clahe_demo", dst)
+
+#RGB直方图的创建
+def create_rgb_hist(image):
+    h,w,c=image.shape
+    rgbHist=np.zeros([16*16*16,1],np.float32)
+    bsize=256/16
+    for row in range(h):
+        for col in range(w):
+            b=image[row,col,0]
+            g=image[row,col,1]
+            r=image[row,col,2]
+            index=np.int(b/bsize)*16*16+np.int(g/bsize)*16+np.int(r/bsize)
+            rgbHist[np.int(index),0]=rgbHist[np.int(index),0]+1
+    return rgbHist
+
+#两幅图直方图比较
+#直方图比较可以进行粗略比较
+def hist_compare(image1,image2):
+    hist1=create_rgb_hist(image1)
+    hist2=create_rgb_hist(image2)
+    match1=cv.compareHist(hist1,hist2,cv.HISTCMP_BHATTACHARYYA)
+    match2=cv.compareHist(hist1,hist2,cv.HISTCMP_CORREL)
+    match3=cv.compareHist(hist1,hist2,cv.HISTCMP_CHISQR)
+    print("巴氏距离：%s，相关性：%s，卡方：%s"%(match1,match2,match3))
+
+
+print("--------helloword--------")
+src = cv.imread("E:/ZqqWinterHoliday/CARD/ori.jpg")
+cv.namedWindow("input image",cv.WINDOW_AUTOSIZE)  #提供一个窗口显示图像
+cv.imshow("input image",src)
+#equalHist_demo(src)
+#clahe_demo(src)
+
+image1 = cv.imread("E:/ZqqWinterHoliday/CARD/cat1.jpg")
+image2 = cv.imread("E:/ZqqWinterHoliday/CARD/cat2.jpg")
+hist_compare(image1,image2)
+
+cv.waitKey(0)
+
+cv.destroyAllWindows()
+
